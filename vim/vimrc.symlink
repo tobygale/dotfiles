@@ -1,0 +1,342 @@
+"
+" Toby's custom VIM config
+" =============================================================
+"
+" To start vim without using this .vimrc file, use:
+"     vim -u NORC
+"
+" To start vim without loading any .vimrc or plugins, use:
+"     vim -u NONE
+"
+
+" vim only
+set nocompatible
+
+" start pathogen
+runtime bundle/vim-pathogen/autoload/pathogen.vim
+execute pathogen#infect()
+execute pathogen#helptags()
+
+" set the mapleader to <space>
+let mapleader=" "
+
+" enable solarized theme
+if !has('gui_running')
+  set term=xterm-256color
+  let g:solarized_termcolors=256
+endif
+syntax enable
+set background=dark
+colorscheme solarized
+
+" configure gVIM
+if has('gui_running')
+  set guifont=Consolas:h9:cANSI
+  source $VIMRUNTIME/vimrc_example.vim
+  source $VIMRUNTIME/mswin.vim
+  behave mswin
+endif
+
+" Custom Functions {{{
+" ================
+
+fun! SetCreationDate()
+  " Searches for a Created string in the first 20 lines of the template
+  exe "1," . 20 . "g/# Created  :.*/s//# Created  : " .strftime("%a, %d %b %Y %H:%M:%S %z")
+endfun
+
+fun! SetScriptName()
+  " Searches for a Scriptname string in the first 20 lines of the template
+  exe "1," . 20 . "g/# Scriptname.*/s//# " .expand("%")
+endfun
+
+fun! SetLastMod()
+  " Searches for a Modified string in the first 20 lines of the template
+  exe "1," . 20 . "g/# Modified :.*/s//# Modified : " .strftime("%a, %d %b %Y %H:%M:%S %z")
+endfun
+
+fun! AppendModeline()
+  " Append modeline after last line in buffer.
+  let l:modeline = printf(" vim: set ts=%d sw=%d tw=%d %set :",
+        \ &tabstop, &shiftwidth, &textwidth, &expandtab ? '' : 'no')
+  let l:modeline = substitute(&commentstring, "%s", l:modeline, "")
+  call append(line("$"), l:modeline)
+endfun
+
+fun! MyDiff()
+  let opt = '-a --binary '
+  if &diffopt =~ 'icase' | let opt = opt . '-i ' | endif
+  if &diffopt =~ 'iwhite' | let opt = opt . '-b ' | endif
+  let arg1 = v:fname_in
+  if arg1 =~ ' ' | let arg1 = '"' . arg1 . '"' | endif
+  let arg2 = v:fname_new
+  if arg2 =~ ' ' | let arg2 = '"' . arg2 . '"' | endif
+  let arg3 = v:fname_out
+  if arg3 =~ ' ' | let arg3 = '"' . arg3 . '"' | endif
+  let eq = ''
+  if $VIMRUNTIME =~ ' '
+    if &sh =~ '\<cmd'
+      let cmd = '""' . $VIMRUNTIME . '\diff"'
+      let eq = '"'
+    else
+      let cmd = substitute($VIMRUNTIME, ' ', '" ', '') . '\diff"'
+    endif
+  else
+    let cmd = $VIMRUNTIME . '\diff'
+  endif
+  silent execute '!' . cmd . ' ' . opt . arg1 . ' ' . arg2 . ' > ' . arg3 . eq
+endfun
+
+" }}}
+
+" Editor Behaviour {{{
+" ====================
+
+set showmode                    " always show what mode we are in
+set nowrap                      " don't wrap lines
+set tabstop=8                   " a tab is 8 spaces (recommended in :help tabstop)
+set softtabstop=2               " a tab is acutally 2 spaces
+set shiftwidth=2                " spaces to use for autoindent
+set shiftround                  " use multiple of shiftwidth when indenting with '<' and '>'
+set expandtab                   " expand tabs by default (overloadable per file type later)
+set backspace=indent,eol,start  " allow backspacing over everything in insert mode
+set autoindent                  " always set autoindenting on
+set copyindent                  " copy the previous indentation on autoindenting
+set showmatch                   " set show matching parenthesis
+set ignorecase                  " ignore case when searching
+set smartcase                   " ignore case if search pattern is all lowercase,
+                                "    case-sensitive otherwise
+set smarttab                    " insert tabs on the start of a line according to
+                                "    shiftwidth, not tabstop
+set hlsearch                    " highlight search terms
+set incsearch                   " show search matches as you type
+set pastetoggle=<F9>            " when in insert mode, press <F9> to go to
+                                "    paste mode, where you can paste mass data
+                                "    that won't be autoindented
+set mouse=a                     " enable using the mouse if terminal emulator
+                                "    supports it (xterm does)
+set fileformats="unix,dos,mac"
+set formatoptions+=1            " When wrapping paragraphs, don't end lines
+                                "    with 1-letter words (looks stupid)
+
+set nrformats=                  " make <C-a> and <C-x> play well with
+                                "    zero-padded numbers (i.e. don't consider
+                                "    them octal or hex)
+
+set shortmess+=I                " hide the launch screen
+set clipboard=unnamed           " normal OS clipboard interaction
+
+" }}}
+
+" Editor Layout {{{
+" =================
+
+set termencoding=utf-8
+set encoding=utf-8
+set lazyredraw                  " don't update the display while executing macros
+set laststatus=2                " tell VIM to always put a status line in, even
+                                "    if there is only one window
+set cmdheight=2                 " use a status bar that is 2 rows high
+
+" }}}
+
+" Folding Behaviour {{{
+" =====================
+
+" save folds
+au BufWinLeave * silent! mkview
+au BufWinEnter * silent! loadview
+
+autocmd BufReadPost *
+  \ if line("'\"") > 0 && line("'\"") <= line("$") |
+  \   exe "normal g`\"" |
+  \ endif
+
+set foldenable                  " enable folding
+set foldcolumn=2                " add a fold column
+set foldmethod=marker           " detect triple-{ style fold markers
+set foldlevelstart=99           " start out with everything unfolded
+set foldopen=block,hor,insert,jump,mark,percent,quickfix,search,tag,undo
+                                " which commands trigger auto-unfold
+
+fun! MyFoldText()
+  let line = getline(v:foldstart)
+
+  let nucolwidth = &fdc + &number * &numberwidth
+  let windowwidth = winwidth(0) - nucolwidth - 3
+  let foldedlinecount = v:foldend - v:foldstart
+
+  " expand tabs into spaces
+  let onetab = strpart('          ', 0, &tabstop)
+  let line = substitute(line, '\t', onetab, 'g')
+
+  let line = strpart(line, 0, windowwidth - 2 -len(foldedlinecount))
+  let fillcharcount = windowwidth - len(line) - len(foldedlinecount) - 4
+  return line . ' …' . repeat(" ",fillcharcount) . foldedlinecount . ' '
+endfun
+
+set foldtext=MyFoldText()
+
+" Mappings to easily toggle fold levels
+nnoremap z0 :set foldlevel=0<cr>
+nnoremap z1 :set foldlevel=1<cr>
+nnoremap z2 :set foldlevel=2<cr>
+nnoremap z3 :set foldlevel=3<cr>
+nnoremap z4 :set foldlevel=4<cr>
+nnoremap z5 :set foldlevel=5<cr>
+
+" }}}
+
+" Vim Behaviour {{{
+" =================
+
+if has('win32') || has ('win64')
+    let $VIMHOME = $VIM."/vimfiles"
+else
+    let $VIMHOME = $HOME."/.vim"
+endif
+
+" use custom diff function
+set diffexpr=MyDiff()
+
+" setup modeline
+set modeline
+set modelines=3
+
+" setup statusline
+
+" force status to be on-screen all the time
+set laststatus=2
+
+hi User1 guifg=white guibg=red ctermfg=white ctermbg=red gui=bold cterm=bold
+
+set statusline=                                                     " clear the statusline
+set statusline+=%-3.3n\                                             " buffer number
+set statusline+=%1*                                                 " highlight flags in red
+set statusline+=%m                                                  " flags
+set statusline+=%*                                                  " back to orig colours
+set statusline+=%f\                                                 " file name
+set statusline+=%h%r%w                                              " flags
+set statusline+=[%{strlen(&ft)?&ft:'none'},                         " filetype
+set statusline+=%{strlen(&fenc)?&fenc:&enc},                        " encoding
+set statusline+=%{&fileformat}]                                     " file format
+set statusline+=%=                                                  " right align
+set statusline+=%{synIDattr(synID(line('.'),col('.'),1),'name')}\   " highlight
+set statusline+=%b,0x%-8B\                                          " current char
+set statusline+=%-14.(%l,%c%V%)\ %<%P                               " offset
+
+set hidden                      " hide buffers instead of closing them this
+                                "    means that the current buffer can be put
+                                "    to background without being written; and
+                                "    that marks and undo history are preserved
+set switchbuf=useopen           " reveal already opened files from the
+                                " quickfix window instead of opening new
+                                " buffers
+set history=1000                " remember more commands and search history
+set undolevels=1000             " use many muchos levels of undo
+if v:version >= 730
+    set undofile                " keep a persistent backup file
+    set undodir=$VIMHOME/undo,~/tmp,/tmp
+endif
+set nobackup                    " do not keep backup files, it's 70's style cluttering
+set noswapfile                  " do not write annoying intermediate swap files,
+                                "    who did ever restore from swap files anyway?
+
+set cursorline                  " highlight the current line
+set visualbell                  " don't beep
+set noerrorbells                " don't beep
+set directory=$VIMHOME/temp,~/tmp,/tmp
+                                " store swap files in one of these directories
+                                "    (in case swapfile is ever turned on)
+set viminfo='20,\"80            " read/write a .viminfo file, don't store more
+                                "    than 80 lines of registers
+set wildmenu                    " make tab completion for files/buffers act like bash
+set wildmode=list:full          " show a list when pressing tab and complete
+                                "    first full match
+set wildignore=*.swp,*.bak,*.pyc,*.class
+set showcmd                     " show (partial) command in the last line of the screen
+                                "    this also shows visual selection info
+
+
+" }}}
+
+" Key Bindings {{{
+" ================
+
+nmap    <F10>                 :set number!<ENTER>
+nmap    <c-F10>               :set list!<ENTER>
+
+nmap    <F11>                 :e.<CR>
+
+nmap    <F12>                 :e $MYVIMRC<ENTER>
+nmap    <c-F12>               :source $MYVIMRC<ENTER>
+
+noremap <F2>                  :buffers<ENTER>
+noremap <C-F2>                :bdelete<CR>
+noremap <F3>                  :bp<ENTER>
+noremap <F4>                  :bn<ENTER>
+
+noremap <F5>                  :tabs<CR>
+noremap <F6>                  :tabnew<CR>
+noremap <F7>                  :tabp<CR>
+noremap <F8>                  :tabn<CR>
+
+nmap    <silent> <A-Up>       :wincmd k<CR>
+nmap    <silent> <A-Down>     :wincmd j<CR>
+nmap    <silent> <A-Left>     :wincmd h<CR>
+nmap    <silent> <A-Right>    :wincmd l<CR>
+
+nnoremap <silent> <Leader>ml  :call AppendModeline()<CR>
+
+" Avoid accidental hits of <F1> while aiming for <Esc>
+noremap! <F1> <Esc>
+
+" Close windows/buffers
+nnoremap <leader>Q :q<CR>    " Quickly close the current window
+nnoremap <leader>q :bd<CR>   " Quickly close the current buffer
+nnoremap <leader>ls :ls<CR>  " List the open buffers
+
+" Clears the search register
+nnoremap <silent> <leader>/ :nohlsearch<CR>
+
+" Ooops, you forgot sudo? :)
+cmap w!! w !sudo tee > /dev/null %
+
+" make p in Visual mode replace the selected text with the yank register
+vnoremap p <Esc>:let current_reg = @"<CR>gvdi<C-R>=current_reg<CR><Esc>
+
+" Quick yanking to the end of the line
+nnoremap Y y$
+
+" Pull word under cursor into LHS of a substitute (for quick search and replace)
+nnoremap <leader>z :%s#\<<C-r>=expand("<cword>")<CR>\>#
+
+" }}}
+
+" Templates {{{
+" =============
+
+" Perl
+autocmd BufNewFile                  *.pl     0r $VIMHOME/skel/skeleton.pl
+autocmd BufNewFile                  *.pl     call SetScriptName()
+autocmd BufNewFile                  *.pl     call SetCreationDate()
+autocmd BufWritePre,FileWritePre    *.pl     ks|call SetLastMod()|'s
+
+" Bash
+autocmd BufNewFile                  *.sh     0r $VIMHOME/skel/skeleton.sh
+autocmd BufNewFile                  *.sh     call SetScriptName()
+autocmd BufNewFile                  *.sh     call SetCreationDate()
+autocmd BufWritePre,FileWritePre    *.sh     ks|call SetLastMod()|'s
+
+" Bash functions
+autocmd BufNewFile                  *.func  0r $VIMHOME/skel/skeleton.sh
+autocmd BufNewFile                  *.func  call SetScriptName()
+autocmd BufNewFile                  *.func  call SetCreationDate()
+autocmd BufWritePre,FileWritePre    *.func  ks|call SetLastMod()|'s
+
+" anything
+autocmd BufWritePre,FileWritePre    *       ks|:silent! call SetLastMod()|'s
+
+" }}}
+
+" vim: set ts=8 sw=2 tw=78 et :

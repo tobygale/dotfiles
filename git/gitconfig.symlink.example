@@ -1,0 +1,14 @@
+[user]
+        name = AUTHORNAME
+        email = AUTHOREMAIL
+[credential]
+        helper = GIT_CREDENTIAL_HELPER
+[core]
+        editor = vim
+        pager = more
+[merge]
+        tool = vimdiff
+[color]
+        ui = true
+[alias]
+        lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
