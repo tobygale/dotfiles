@@ -1,0 +1,43 @@
+#   . b a s h _ p r o f i l e
+#   ===================================
+#
+#   The .bash_profile is included when the shell is started in 'login' mode.
+#   See the 'bash' man-page for further information.
+#
+
+# Path to your .dotfiles installation
+export DOT=$HOME/.dotfiles
+
+# Switch to zsh if it's installed
+[[ -x /bin/zsh ]] && {
+  export SHELL=/bin/zsh
+  exec /bin/zsh -l
+}
+
+# Load any local .bashrc
+[[ -f ~/.bashrc ]] && {
+  . ~/.bashrc
+}
+
+# Variables
+export EDITOR=vim
+export GITAWAREPROMPT=$DOT/bash/git-aware-prompt
+source $GITAWAREPROMPT/main.sh
+export PS1="\e[0;31m┌[\e[m\u\e[0;31m@\e[m\h\e[0;31m] [\e[m\D{%d-%m-%Y//%H:%M:%S}\e[0;31m]\e[m \[$txtcyn\]\$git_branch\[$txtred\]\$git_dirty\[$txtrst\]\n\e[0;31m└[\e[m\w\e[0;31m]> \e[m"
+
+# Load custom functions
+shopt -s nullglob
+
+for file in $DOT/functions/*.bash
+do
+  . $file
+done
+
+for file in $DOT/functions/*.sh
+do
+  . $file
+done
+
+shopt -u nullglob
+
+# vim: set ft=sh ts=8 sw=2 tw=0 et :#

@@ -151,4 +151,4 @@ fi
 echo ''
 echo '  All installed!'
 
-/* vim: set ft=sh ts=8 sw=2 tw=0 et :*/
+# vim: set ft=sh ts=8 sw=2 tw=0 et :#
