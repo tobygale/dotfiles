@@ -1,0 +1,3 @@
+# Change the default DIR colour to purple
+# The blue is hard to read on the default black background
+DIR    00;35
