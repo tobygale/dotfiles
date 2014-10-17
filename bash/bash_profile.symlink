@@ -23,7 +23,7 @@ export DOT=$HOME/.dotfiles
 export EDITOR=vim
 export GITAWAREPROMPT=$DOT/bash/git-aware-prompt
 source $GITAWAREPROMPT/main.sh
-export PS1="\e[0;31m┌[\e[m\u\e[0;31m@\e[m\h\e[0;31m] [\e[m\$(basename $SHELL)\e[0;31m]\e[m [\e[m\D{%d-%m-%Y//%H:%M:%S}\e[0;31m]\e[m \[$txtcyn\]\$git_branch\[$txtred\]\$git_dirty\[$txtrst\]\n\e[0;31m└[\e[m\w\e[0;31m]> \e[m"
+export PS1="\e[0;31m┌[\e[m\u\e[0;31m@\e[m\h\e[0;31m] [\e[m\$(basename $SHELL)\e[0;31m]\e[m \e[0;31m[\e[m\D{%d-%m-%Y}\e[0;31m@\e[m\D{%H:%M:%S}\e[0;31m]\e[m \[$txtcyn\]\$git_branch\[$txtred\]\$git_dirty\[$txtrst\]\n\e[0;31m└[\e[m\w\e[0;31m]> \e[m"
 export PS2=" \e[0;31m|> \e[m"
 
 # Load custom functions
