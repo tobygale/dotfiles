@@ -12,7 +12,7 @@
 #
 # ------------------------------------------------------------------------------
 
-# Modified to work with zsh in vimode
+# Modified to work with zsh in vimode using xterm
 # - Toby Gale
 
 sudo-command-line() {
@@ -23,5 +23,5 @@ sudo-command-line() {
 zle -N sudo-command-line
 
 # Defined shortcut keys: <F1>
-bindkey -M viins '[[A' sudo-command-line
-bindkey -M vicmd '[[A' sudo-command-line
+bindkey -M viins 'OP' sudo-command-line
+bindkey -M vicmd 'OP' sudo-command-line
