@@ -30,4 +30,6 @@ RPROMPT='${vim_mode}'
 
 ZSH_THEME_GIT_PROMPT_PREFIX="%{$fg[red]%}[%{$fg_bold[white]%}"
 ZSH_THEME_GIT_PROMPT_SUFFIX="%{$reset_color%}%{$fg[red]%}] "
-ZSH_THEME_GIT_PROMPT_DIRTY=" %{$fg[red]%}⚡%{$reset_color%}"
+
+# mark dirty prompt with a right-pointing double angle quotation mark (0xBB)
+ZSH_THEME_GIT_PROMPT_DIRTY=" %{$fg[red]%}»%{$reset_color%}"
