@@ -39,10 +39,7 @@ bindkey '^h' backward-delete-char
 bindkey '^w' backward-kill-word
 bindkey '^r' history-incremental-search-backward
 
-#bindkey '^[^[[D' backward-word
-#bindkey '^[^[[C' forward-word
-#bindkey '^[[5D' beginning-of-line
-#bindkey '^[[5C' end-of-line
-#bindkey '^[[3~' delete-char
-#bindkey '^[^N' newtab
-#bindkey '^?' backward-delete-char
+# local overrides
+if [[ -f ~/.zshrc.local ]]; then
+  source ~/.zshrc.local
+fi
