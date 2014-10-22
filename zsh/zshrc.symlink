@@ -98,3 +98,8 @@ fi
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
+
+# local overrides
+if [[ -f ~/.zshrc.local ]]; then
+  source ~/.zshrc.local
+fi 

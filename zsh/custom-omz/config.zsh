@@ -39,7 +39,3 @@ bindkey '^h' backward-delete-char
 bindkey '^w' backward-kill-word
 bindkey '^r' history-incremental-search-backward
 
-# local overrides
-if [[ -f ~/.zshrc.local ]]; then
-  source ~/.zshrc.local
-fi
