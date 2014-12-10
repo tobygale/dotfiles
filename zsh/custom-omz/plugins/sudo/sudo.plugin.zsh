@@ -23,5 +23,6 @@ sudo-command-line() {
 zle -N sudo-command-line
 
 # Defined shortcut keys: <F1>
-bindkey -M viins 'OP' sudo-command-line
-bindkey -M vicmd 'OP' sudo-command-line
+bindkey -M viins 'OQ' sudo-command-line
+bindkey -M vicmd 'OQ' sudo-command-line
+
