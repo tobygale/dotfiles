@@ -31,7 +31,11 @@ colorscheme solarized
 
 " configure gVIM
 if has('gui_running')
-  set guifont=Consolas:h9:cANSI
+  if has('gui_win32')
+    set guifont=Consolas:h9:cANSI
+  else
+    set guifont=Droid\ Sans\ Mono\ 10
+  endif
   source $VIMRUNTIME/vimrc_example.vim
   source $VIMRUNTIME/mswin.vim
   behave mswin
