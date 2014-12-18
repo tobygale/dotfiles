@@ -1,9 +1,6 @@
 ## Toby's Dotfiles ##
 Your dotfiles personalise your system; these are mine.
 
-### notice ###
-This is a work in progress, use at your own risk!
-
 ### dotfiles ###
 As a system administrator, I log on to a lot of different servers.  I need to centralise and standardise my customisation; this repository will allow me to do this easily.
 
