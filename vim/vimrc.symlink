@@ -137,7 +137,7 @@ set clipboard=unnamed           " normal OS clipboard interaction
 
 set termencoding=utf-8
 set encoding=utf-8
-set lazyredraw                  " don't update the display while executing macros
+set nolazyredraw                  " don't update the display while executing macros
 set laststatus=2                " tell VIM to always put a status line in, even
                                 "    if there is only one window
 set cmdheight=2                 " use a status bar that is 2 rows high
@@ -291,6 +291,9 @@ nmap    <silent> <A-Left>     :wincmd h<CR>
 nmap    <silent> <A-Right>    :wincmd l<CR>
 
 nnoremap <silent> <Leader>ml  :call AppendModeline()<CR>
+
+" Toggle NERDTree
+map <C-n> :NERDTreeToggle<CR>
 
 " Avoid accidental hits of <F1> while aiming for <Esc>
 noremap! <F1> <Esc>
