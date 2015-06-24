@@ -99,6 +99,10 @@ fi
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
+if [[ -f ~/.dir_colors ]]; then
+  eval `dircolors ~/.dir_colors`
+fi
+
 # local overrides
 if [[ -f ~/.zshrc.local ]]; then
   source ~/.zshrc.local
